@@ -1,0 +1,35 @@
+#Scrap Data from any website 
+
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+from urllib.parse import urlparse
+
+#Data extraction from any website
+def get_text(url):
+    links = []
+    valid_links = []
+    text = []
+    base_url = url
+    response = requests.get(base_url)
+    html = reponse.text
+    soup = BeautifulSoup(html, 'lxml')
+    
+    for link in soup.find_all('a'):
+        links.append(link.get('href'))
+        
+    for link in links:
+        if link and (link.startswith("http") or link.startswith("https")) and not link.startswith(("tel:", "sms:")):
+            valid_links.append(link)
+            
+    for base_url in valid_links:
+        response = requests.get(base_url)
+        html = response.text
+        soup = BeautifulSoup(html, 'lxml')
+        text.append(soup.get_text().strip(). replace('\n', ' '))
+        
+        
+    return text
+
+result = get_text('https://www.mentalhealth.gov/basics/what-is-mental-health')
+print(result)
